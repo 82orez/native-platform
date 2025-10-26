@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "prisma generate && next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "generate-types": "npx supabase gen types typescript --project-id dsyovpezbyuavbcykmck --schema public > src/types_db.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",
