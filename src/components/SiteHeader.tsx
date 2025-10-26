@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 export default function SiteHeader() {
+  const { status, data } = useSession();
+
   return (
     <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -11,7 +16,7 @@ export default function SiteHeader() {
             <Link href="/" className="flex items-center gap-2">
               {/* Replace with next/image if you have an actual logo file */}
               <span aria-hidden className="inline-block h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600" />
-              <span className="truncate text-lg font-bold tracking-tight">TutorBridge</span>
+              <span className="truncate text-lg font-bold tracking-tight">Friending</span>
             </Link>
           </div>
 
@@ -74,24 +79,34 @@ export default function SiteHeader() {
           </nav>
 
           {/* Right: Auth / My page */}
-          <div className="ml-auto hidden items-center gap-2 md:flex">
-            <Link
-              href="/mypage"
-              className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
-              마이페이지
-            </Link>
-            {/* Auth buttons are placeholders; wire up to your auth logic */}
-            <Link
-              href="/users/sign-in"
-              className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
-              로그인
-            </Link>
-            <Link
-              href="/auth/signout"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
-              로그아웃
-            </Link>
-          </div>
+          {status === "authenticated" && (
+            <div>
+              <Link
+                href="/mypage"
+                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
+                마이페이지
+              </Link>
+              <button
+                className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
+                onClick={() => {
+                  // * 로그아웃 이후 redirect 할 경로설정.
+                  signOut({ callbackUrl: "/" });
+                }}>
+                로그아웃
+              </button>
+            </div>
+          )}
+
+          {status === "unauthenticated" && (
+            <div className="ml-auto hidden items-center gap-2 md:flex">
+              {/* Auth buttons are placeholders; wire up to your auth logic */}
+              <Link
+                href="/users/sign-in"
+                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
+                로그인
+              </Link>
+            </div>
+          )}
 
           {/* Mobile: menu & search */}
           <div className="ml-auto flex flex-1 items-center justify-end gap-2 md:hidden">

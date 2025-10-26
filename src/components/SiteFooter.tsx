@@ -9,7 +9,7 @@ export default function SiteFooter() {
           <div>
             <Link href="/" className="flex items-center gap-2">
               <span aria-hidden className="inline-block h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600" />
-              <span className="text-lg font-bold tracking-tight">TutorBridge</span>
+              <span className="text-lg font-bold tracking-tight">Friending</span>
             </Link>
             <p className="mt-4 text-sm text-gray-600">지역 기반 원어민 강의 매칭, 예약, 결제를 한 곳에서. 안전한 검증과 리뷰로 신뢰를 쌓습니다.</p>
           </div>
@@ -90,7 +90,7 @@ export default function SiteFooter() {
 
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 border-t py-6 text-sm text-gray-600 sm:flex-row">
-          <p>© {new Date().getFullYear()} TutorBridge. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Friending. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/sitemap" className="hover:text-indigo-600">
               사이트맵
