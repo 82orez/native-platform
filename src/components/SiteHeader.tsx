@@ -82,7 +82,7 @@ export default function SiteHeader() {
             </Link>
             {/* Auth buttons are placeholders; wire up to your auth logic */}
             <Link
-              href="/auth/signin"
+              href="/users/sign-in"
               className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
               로그인
             </Link>
