@@ -102,8 +102,14 @@ export default function SiteHeader() {
               {/* Auth buttons are placeholders; wire up to your auth logic */}
               <Link
                 href="/users/sign-in"
-                className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
+                className="w-[75px] rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
                 로그인
+              </Link>
+
+              <Link
+                href="/users/sign-up/choice"
+                className="w-[75px] rounded-lg bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-800 hover:bg-gray-300 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none">
+                회원가입
               </Link>
             </div>
           )}
