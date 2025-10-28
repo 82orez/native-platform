@@ -16,6 +16,13 @@ model Test {
   updated_at DateTime? @db.Timestamptz()
 }
 
+enum Role {
+  admin
+  subAdmin
+  teacher
+  manager
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -24,6 +31,7 @@ model User {
   credentials   Boolean   @default(false) // 이메일로 회원가입할 때만 True
   emailVerified DateTime?
   image         String?
+  role          Role      @default(teacher)
   accounts      Account[]
   sessions      Session[]
   // Optional for WebAuthn support
