@@ -78,6 +78,13 @@ export default function SiteHeader() {
             </form>
           </nav>
 
+          <div className="hidden items-center gap-2 md:flex">
+            <a className="font-exZtrabold rounded-full bg-yellow-300 px-4 py-2 text-sm whitespace-nowrap shadow hover:bg-yellow-400">이력서 등록</a>
+            <a className="rounded-full bg-blue-500 px-4 py-2 text-sm font-extrabold whitespace-nowrap text-white shadow hover:bg-blue-600">
+              공고 등록
+            </a>
+          </div>
+
           {/* Right: Auth / My page */}
           {status === "authenticated" && (
             <div>
@@ -97,12 +104,6 @@ export default function SiteHeader() {
             </div>
           )}
 
-          <div className="hidden items-center gap-2 md:flex">
-            <a className="font-exZtrabold rounded-full bg-yellow-300 px-4 py-2 text-sm whitespace-nowrap shadow hover:bg-yellow-400">이력서 등록</a>
-            <a className="rounded-full bg-blue-500 px-4 py-2 text-sm font-extrabold whitespace-nowrap text-white shadow hover:bg-blue-600">
-              공고 등록
-            </a>
-          </div>
           {status === "unauthenticated" && (
             <div className="ml-auto hidden items-center gap-2 md:flex">
               {/* Auth buttons are placeholders; wire up to your auth logic */}
