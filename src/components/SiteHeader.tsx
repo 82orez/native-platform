@@ -86,41 +86,38 @@ export default function SiteHeader() {
           </div>
 
           {/* Right: Auth / My page */}
-          {status === "authenticated" && (
-            <div>
-              <Link
-                href="/mypage"
-                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
-                마이페이지
-              </Link>
-              <button
-                className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
-                onClick={() => {
-                  // * 로그아웃 이후 redirect 할 경로설정.
-                  signOut({ callbackUrl: "/" });
-                }}>
-                로그아웃
-              </button>
-            </div>
-          )}
-
-          {status === "unauthenticated" && (
-            <div className="ml-auto hidden items-center gap-2 md:flex">
-              {/* Auth buttons are placeholders; wire up to your auth logic */}
-              <Link
-                href="/users/sign-in"
-                className="w-[75px] rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
-                로그인
-              </Link>
-
-              <Link
-                href="/users/sign-up"
-                className="w-[75px] rounded-lg bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-800 hover:bg-gray-300 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none">
-                회원가입
-              </Link>
-            </div>
-          )}
-
+          <div className="ml-auto hidden items-center gap-2 md:flex md:w-[180px]">
+            {status === "authenticated" ? (
+              <>
+                <Link
+                  href="/mypage"
+                  className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
+                  마이페이지
+                </Link>
+                <button
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
+                  onClick={() => {
+                    // * 로그아웃 이후 redirect 할 경로설정.
+                    signOut({ callbackUrl: "/" });
+                  }}>
+                  로그아웃
+                </button>
+              </>
+            ) : status === "unauthenticated" ? (
+              <>
+                <Link
+                  href="/users/sign-in"
+                  className="w-[75px] rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none">
+                  로그인
+                </Link>
+                <Link
+                  href="/users/sign-up"
+                  className="w-[75px] rounded-lg bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-800 hover:bg-gray-300 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none">
+                  회원가입
+                </Link>
+              </>
+            ) : null}
+          </div>
           {/* Mobile: menu & search */}
           <div className="ml-auto flex flex-1 items-center justify-end gap-2 md:hidden">
             <form action="/search" role="search" className="flex-1">
