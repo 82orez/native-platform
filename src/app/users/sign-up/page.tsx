@@ -8,6 +8,8 @@ import Link from "next/link";
 import { GoEye } from "react-icons/go";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { PiEyeClosed } from "react-icons/pi";
+import { BiSolidMessageRounded } from "react-icons/bi";
+import { signIn } from "next-auth/react";
 
 export default function SignUp() {
   const router = useRouter();
@@ -109,12 +111,18 @@ export default function SignUp() {
     },
   });
 
+  const [isKakaoLoading, setIsKakaoLoading] = useState(false);
+  const handleClickKakao = async () => {
+    setIsKakaoLoading(true);
+    await signIn("kakao", { callbackUrl: "/" });
+  };
+
   return (
     <div className="mx-auto mt-10 w-full max-w-[375px] rounded-lg bg-white p-6 shadow-lg">
-      <h1 className="mb-8 text-2xl font-semibold">이메일 회원 가입하기</h1>
+      <h1 className="mb-8 text-2xl font-semibold">회원 가입하기</h1>
 
       {/*단계별 진행 바 (Progress Indicator)*/}
-      <div className="mb-16">
+      <div className="mb-10">
         <div className="flex items-center justify-between">
           {/* Step 1 */}
           <div className="flex flex-col items-center">
@@ -296,11 +304,30 @@ export default function SignUp() {
       {/*{message.startsWith("Error") && <p className={"mt-2 text-red-500"}>{message}</p>}*/}
       {/*{message && <p className={`mt-2 ${message.startsWith("Error") ? "text-red-500" : "text-green-500"}`}>{message}</p>}*/}
 
+      <div className="my-10 flex items-center">
+        <hr className="flex-grow border-t border-gray-300" />
+        <span className="px-3 text-sm text-gray-500">또는 카카오로 시작하기</span>
+        <hr className="flex-grow border-t border-gray-300" />
+      </div>
+
+      <div className="">
+        <button
+          type="button"
+          onClick={handleClickKakao}
+          disabled={isKakaoLoading}
+          className="flex w-full items-center rounded-md border bg-yellow-300 px-10 py-2 text-center font-semibold hover:bg-yellow-400 disabled:opacity-50 md:px-11">
+          {isKakaoLoading ? <AiOutlineLoading3Quarters className={"animate-spin"} /> : <BiSolidMessageRounded size={22} />}
+          <div className={"grow"} style={{ color: "rgba(0, 0, 0, 0.85)" }}>
+            카카오로 시작하기
+          </div>
+        </button>
+      </div>
+
       <div
         className={clsx("mt-20 flex justify-center hover:underline", {
           "pointer-events-none": sendVerification.isPending || validateCode.isPending || registerUser.isPending,
         })}>
-        <Link href={"/public"}>Back to Home</Link>
+        <Link href={"/"}>Back to Home</Link>
       </div>
     </div>
   );
