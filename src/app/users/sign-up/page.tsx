@@ -212,6 +212,7 @@ export default function SignUp() {
             <p className="mt-2 text-xs text-slate-500">입력하신 이메일로 인증코드를 보냈습니다. 메일함을 확인해 주세요.</p>
           )}
           {isEmailVerified && <p className="mt-2 text-xs font-medium text-emerald-600">✓ 이메일 인증이 완료되었습니다.</p>}
+          {errorMessage && <p className="mt-2 animate-pulse text-center text-sm font-semibold text-red-500">{errorMessage}</p>}
         </section>
 
         {/* STEP 2. 인증코드 입력 */}
