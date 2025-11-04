@@ -12,15 +12,20 @@ import { PiEyeClosed } from "react-icons/pi";
 export default function SignUp() {
   const router = useRouter();
 
-  const [step, setStep] = useState<"inputEmail" | "verifyCode" | "inputPassword">("inputEmail");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // 비밀번호 확인 입력 상태 추가
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // 단계 상태
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   // 이메일 유효성 검사
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -28,8 +33,11 @@ export default function SignUp() {
   // 비밀번호 유효성 검사 (영문 포함 6자리 이상)
   const isValidPassword = (password: string) => /^(?=.*[A-Za-z]).{6,}$/.test(password);
 
-  const isPasswordMatch = password === confirmPassword; // 비밀번호 일치 여부 확인
-  const isPasswordValid = isValidPassword(password); // 비밀번호 유효성 확인
+  const isPasswordMatch = password === confirmPassword;
+  const isPasswordValid = isValidPassword(password);
+
+  // 현재 단계 (UI용)
+  const currentStep = !isEmailSent ? 1 : isEmailSent && !isEmailVerified ? 2 : 3;
 
   const sendVerification = useMutation({
     mutationFn: async () => {
@@ -48,11 +56,14 @@ export default function SignUp() {
     onSuccess: (data) => {
       setMessage(data.message || "Verification code sent to email.");
       setErrorMessage("");
-      setStep("verifyCode");
+      setIsEmailSent(true);
+      setIsEmailVerified(false);
     },
     onError: (error: any) => {
       setMessage(`Error: ${error.message}`);
       setErrorMessage(error.message);
+      setIsEmailSent(false);
+      setIsEmailVerified(false);
     },
   });
 
@@ -71,13 +82,14 @@ export default function SignUp() {
       return data;
     },
     onSuccess: (data) => {
-      setStep("inputPassword");
       setMessage(data.message || "Email verified successfully!");
       setErrorMessage("");
+      setIsEmailVerified(true);
     },
     onError: (error: any) => {
       setMessage(`Error: ${error.message}`);
-      setErrorMessage(`${error.message}`);
+      setErrorMessage(error.message);
+      setIsEmailVerified(false);
     },
   });
 
@@ -100,52 +112,118 @@ export default function SignUp() {
       setMessage(data.message || "Registration successful!");
       setErrorMessage("");
       alert(`${data.message} 로그인 페이지로 이동합니다.`);
-      // * 회원 가입에 성공하면 이동할 page
       router.push("/users/sign-in");
     },
     onError: (error: any) => {
       setMessage(`Error: ${error.message}`);
-      setErrorMessage(`${error.message}`);
+      setErrorMessage(error.message);
     },
   });
 
+  const inputBase =
+    "block w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 " +
+    "outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 disabled:bg-slate-100";
+
+  const labelBase = "mb-1.5 block text-sm font-medium text-slate-700";
+
+  const sectionTitleBase = "mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800";
+
   return (
-    <div className="mx-auto mt-10 w-full max-w-[375px] rounded-lg bg-white p-6 shadow-lg">
-      <h1 className="mb-10 text-2xl font-semibold">회원 가입하기</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 px-4">
+      <div className="w-full max-w-md rounded-2xl bg-white/80 p-7 shadow-xl ring-1 ring-slate-900/5 backdrop-blur">
+        {/* 헤더 */}
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Email 회원 가입하기</h1>
+          <p className="mt-2 text-xs text-slate-500">이메일 인증 후 비밀번호를 설정하여 계정을 생성합니다.</p>
+        </header>
 
-      {step === "inputEmail" ? (
-        <>
-          <p className={"mb-4 border-b-4 border-blue-400 pb-1 text-xl"}>Step 1. 이메일 입력하기</p>
+        {/* 스텝 인디케이터 */}
+        <ol className="mb-7 flex items-center justify-between text-xs font-medium text-slate-500">
+          {[
+            { step: 1, label: "이메일" },
+            { step: 2, label: "인증코드" },
+            { step: 3, label: "비밀번호" },
+          ].map(({ step, label }, idx, arr) => {
+            const active = currentStep === step;
+            const done = currentStep > step;
+            const last = idx === arr.length - 1;
 
-          <label htmlFor="email" className="mb-2 block">
-            사용하실 이메일을 입력해 주세요.
+            return (
+              <li key={step} className="flex flex-1 items-center">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={clsx("flex h-7 w-7 items-center justify-center rounded-full text-xs", {
+                      "bg-blue-600 text-white shadow-sm": active,
+                      "bg-emerald-500 text-white shadow-sm": done,
+                      "bg-slate-200 text-slate-600": !active && !done,
+                    })}>
+                    {done ? "✓" : step}
+                  </div>
+                  <span
+                    className={clsx("hidden text-[11px] md:inline", {
+                      "text-blue-600": active,
+                      "text-emerald-600": done,
+                    })}>
+                    {label}
+                  </span>
+                </div>
+                {!last && <div className="mx-2 h-px flex-1 bg-gradient-to-r from-slate-200 via-slate-200 to-transparent" />}
+              </li>
+            );
+          })}
+        </ol>
+
+        {/* STEP 1. 이메일 입력 */}
+        <section className="mb-6 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+          <p className={sectionTitleBase}>
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[11px] text-white">1</span>
+            이메일 입력하기
+          </p>
+
+          <label htmlFor="email" className={labelBase}>
+            사용하실 이메일
           </label>
           <input
             id="email"
             type="email"
             placeholder="abc@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mb-3 block w-full border p-2"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setIsEmailSent(false);
+              setIsEmailVerified(false);
+            }}
+            className={inputBase}
           />
-          <div className={"relative"}>
-            <button
-              onClick={() => sendVerification.mutate()}
-              disabled={!isValidEmail(email) || sendVerification.isPending}
-              // disabled={true}
-              className={clsx("w-full rounded-md bg-blue-600 p-2 text-white hover:bg-blue-400 disabled:opacity-80")}>
-              {sendVerification.isPending ? "인증 코드 보내는 중..." : "이메일로 인증 코드 보내기"}
-            </button>
-            {sendVerification.isPending && <AiOutlineLoading3Quarters className={"absolute top-3.5 left-10 animate-spin md:left-11"} />}
-          </div>
-        </>
-      ) : step === "verifyCode" ? (
-        <>
-          <p className={"mb-4 border-b-4 border-green-400 pb-1 text-xl"}>Step 2. 인증코드 입력하기</p>
 
-          <div className={clsx("", { hidden: !message || message === "Error: 이미 가입된 이메일입니다." })}>
-            <label htmlFor="token" className="mt-2 mb-2 block">
-              인증코드를 입력해 주세요.
+          <button
+            type="button"
+            onClick={() => sendVerification.mutate()}
+            disabled={!isValidEmail(email) || sendVerification.isPending}
+            className={clsx(
+              "relative mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-medium text-white",
+              "transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400",
+            )}>
+            {sendVerification.isPending && <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />}
+            {sendVerification.isPending ? "인증 코드 보내는 중..." : isEmailSent ? "인증 코드 다시 보내기" : "이메일로 인증 코드 보내기"}
+          </button>
+
+          {isEmailSent && !isEmailVerified && (
+            <p className="mt-2 text-xs text-slate-500">입력하신 이메일로 인증코드를 보냈습니다. 메일함을 확인해 주세요.</p>
+          )}
+          {isEmailVerified && <p className="mt-2 text-xs font-medium text-emerald-600">✓ 이메일 인증이 완료되었습니다.</p>}
+        </section>
+
+        {/* STEP 2. 인증코드 입력 */}
+        <section className="mb-6 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+          <p className={sectionTitleBase}>
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[11px] text-white">2</span>
+            인증코드 입력하기
+          </p>
+
+          <fieldset disabled={!isEmailSent} className="space-y-2">
+            <label htmlFor="token" className={labelBase}>
+              이메일로 받은 인증코드
             </label>
             <input
               id="token"
@@ -153,95 +231,126 @@ export default function SignUp() {
               placeholder="6자리 인증코드"
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              className="mb-1 block w-full border p-2"
+              className={inputBase}
             />
-            <div className={"relative"}>
+
+            <button
+              type="button"
+              onClick={() => validateCode.mutate()}
+              disabled={!token || validateCode.isPending || !isEmailSent}
+              className={clsx(
+                "relative mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-medium text-white",
+                "transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300",
+              )}>
+              {validateCode.isPending && <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />}
+              {validateCode.isPending ? "인증 중..." : "인증하기"}
+            </button>
+          </fieldset>
+
+          {!isEmailSent && <p className="mt-2 text-xs text-slate-400">먼저 이메일을 입력하고 인증 코드를 보내주세요.</p>}
+        </section>
+
+        {/* STEP 3. 비밀번호 등록 */}
+        <section className="mb-5 rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+          <p className={sectionTitleBase}>
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-[11px] text-white">3</span>
+            비밀번호 등록하기
+          </p>
+
+          <fieldset disabled={!isEmailVerified}>
+            <label htmlFor="password" className={labelBase}>
+              비밀번호
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="영문 포함 6자리 이상"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={inputBase}
+              />
               <button
-                onClick={() => validateCode.mutate()}
-                disabled={!token || validateCode.isPending}
-                className="mt-2 w-full rounded-md bg-green-600 p-2 text-white hover:bg-green-500 disabled:opacity-80">
-                {validateCode.isPending ? "인증 중..." : "인증하기"}
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className={clsx("absolute top-1/2 right-2.5 -translate-y-1/2 text-slate-500 transition hover:text-slate-700", { hidden: !password })}>
+                {showPassword ? <GoEye size={20} /> : <PiEyeClosed size={20} />}
               </button>
-              {validateCode.isPending && <AiOutlineLoading3Quarters className={"absolute top-5 left-12 animate-spin"} />}
             </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <p className={"mb-4 border-b-4 border-blue-400 pb-1 text-xl"}>Step 3. 비밀번호 등록하기</p>
-          <label htmlFor="password" className="mb-1 block">
-            비밀 번호를 입력해 주세요.
-          </label>
-          <div className={"relative"}>
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"} // showPassword 상태에 따라 타입 변경
-              placeholder="영문 포함 6자리 이상"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mb-3 block w-full border p-2"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className={clsx("absolute top-2.5 right-3 text-gray-600 hover:text-gray-800", { hidden: !password })}>
-              {showPassword ? <GoEye size={25} /> : <PiEyeClosed size={25} />}
-            </button>
-          </div>
 
-          {!isPasswordValid && password && <p className="mb-3 text-red-500">비밀번호는 영문을 포함하여 6자리 이상이어야 합니다.</p>}
+            {!isPasswordValid && password && <p className="mt-1 text-xs text-red-500">비밀번호는 영문을 포함하여 6자리 이상이어야 합니다.</p>}
 
-          <label htmlFor="confirmPassword" className="mb-1 block">
-            비밀번호를 확인해 주세요.
-          </label>
-          <div className="relative">
-            <input
-              id="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="비밀번호를 확인"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mb-3 block w-full border p-2"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className={clsx("absolute top-2.5 right-3 text-gray-600 hover:text-gray-800", {
-                hidden: !password || !confirmPassword,
-              })}>
-              {showConfirmPassword ? <GoEye size={25} /> : <PiEyeClosed size={25} />}
-            </button>
-          </div>
+            <label htmlFor="confirmPassword" className={clsx(labelBase, "mt-4")}>
+              비밀번호 확인
+            </label>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="비밀번호를 한번 더 입력"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={inputBase}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className={clsx("absolute top-1/2 right-2.5 -translate-y-1/2 text-slate-500 transition hover:text-slate-700", {
+                  hidden: !password || !confirmPassword,
+                })}>
+                {showConfirmPassword ? <GoEye size={20} /> : <PiEyeClosed size={20} />}
+              </button>
+            </div>
 
-          <div className={clsx("", { hidden: !password || !confirmPassword })}>
-            {!isPasswordMatch ? (
-              <p className="mb-3 animate-pulse text-red-500">비밀번호가 일치하지 않습니다.</p>
-            ) : (
-              <p className="mb-3 text-green-500">비밀번호가 일치합니다.</p>
+            {password && confirmPassword && (
+              <p
+                className={clsx("mt-1 text-xs", {
+                  "text-emerald-600": isPasswordMatch,
+                  "animate-pulse text-red-500": !isPasswordMatch,
+                })}>
+                {isPasswordMatch ? "비밀번호가 일치합니다." : "비밀번호가 일치하지 않습니다."}
+              </p>
             )}
-          </div>
+          </fieldset>
 
-          <div className={"relative"}>
-            <button
-              disabled={!isPasswordMatch || !isPasswordMatch || registerUser.isPending || !password || !confirmPassword}
-              onClick={() => registerUser.mutate()}
-              className="w-full rounded-md bg-blue-600 p-2 text-white hover:bg-blue-400 disabled:opacity-80">
-              {registerUser.isPending ? "회원 가입 중..." : "회원 가입 완료하기"}
-            </button>
-            {registerUser.isPending && <AiOutlineLoading3Quarters className={"absolute top-3.5 left-11 animate-spin md:left-12"} />}
-          </div>
-        </>
-      )}
+          {!isEmailVerified && <p className="mt-2 text-xs text-slate-400">이메일 인증이 완료되면 비밀번호를 설정할 수 있습니다.</p>}
+        </section>
 
-      {errorMessage && <p className="mt-2 animate-pulse text-center text-red-500">{errorMessage}</p>}
-      {/*{message.startsWith("Error") && <p className={"mt-2 text-red-500"}>{message}</p>}*/}
-      {/*{message && <p className={`mt-2 ${message.startsWith("Error") ? "text-red-500" : "text-green-500"}`}>{message}</p>}*/}
+        {/* 회원가입 버튼 */}
+        <div className="mb-3">
+          <button
+            type="button"
+            disabled={!isEmailVerified || !isPasswordValid || !isPasswordMatch || registerUser.isPending}
+            onClick={() => registerUser.mutate()}
+            className={clsx(
+              "flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm",
+              "transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300",
+            )}>
+            {registerUser.isPending && <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />}
+            {registerUser.isPending ? "회원 가입 중..." : "회원 가입 완료하기"}
+          </button>
+        </div>
 
-      <div
-        className={clsx("mt-20 flex justify-center hover:underline", {
-          "pointer-events-none": sendVerification.isPending || validateCode.isPending || registerUser.isPending,
-        })}>
-        <Link href={"/public"}>Back to Home</Link>
+        {/* 메시지 영역 */}
+        {errorMessage && <p className="mb-1 text-center text-xs text-red-500">{errorMessage}</p>}
+        {message && !message.startsWith("Error") && <p className="mb-1 text-center text-xs text-emerald-600">{message}</p>}
+
+        {/* 하단 링크 */}
+        <div
+          className={clsx("mt-4 flex items-center justify-center gap-1 text-xs text-slate-500", {
+            "pointer-events-none opacity-60": sendVerification.isPending || validateCode.isPending || registerUser.isPending,
+          })}>
+          <span>이미 계정이 있으신가요?</span>
+          <Link href="/users/sign-in" className="font-medium text-slate-900 underline-offset-2 hover:underline">
+            로그인하기
+          </Link>
+        </div>
+
+        <div className="mt-3 text-center">
+          <Link href="/public" className="text-[11px] text-slate-400 underline-offset-2 hover:underline">
+            Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );
