@@ -241,7 +241,7 @@ export default function SignUp() {
         className={clsx("mt-20 flex justify-center hover:underline", {
           "pointer-events-none": sendVerification.isPending || validateCode.isPending || registerUser.isPending,
         })}>
-        <Link href={"/"}>Back to Home</Link>
+        <Link href={"/public"}>Back to Home</Link>
       </div>
     </div>
   );

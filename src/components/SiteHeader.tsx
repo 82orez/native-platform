@@ -113,7 +113,7 @@ export default function SiteHeader() {
               </Link>
 
               <Link
-                href="/users/sign-up/choice"
+                href="/users/sign-up"
                 className="w-[75px] rounded-lg bg-gray-200 px-3 py-2 text-center text-sm font-semibold text-gray-800 hover:bg-gray-300 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none">
                 회원가입
               </Link>
