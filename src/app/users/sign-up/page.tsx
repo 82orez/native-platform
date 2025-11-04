@@ -111,7 +111,66 @@ export default function SignUp() {
 
   return (
     <div className="mx-auto mt-10 w-full max-w-[375px] rounded-lg bg-white p-6 shadow-lg">
-      <h1 className="mb-10 text-2xl font-semibold">회원 가입하기</h1>
+      <h1 className="mb-8 text-2xl font-semibold">이메일 회원 가입하기</h1>
+
+      {/*단계별 진행 바 (Progress Indicator)*/}
+      <div className="mb-16">
+        <div className="flex items-center justify-between">
+          {/* Step 1 */}
+          <div className="flex flex-col items-center">
+            <div
+              className={clsx(
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
+                step === "inputEmail" ? "bg-blue-600 text-white" : "bg-green-600 text-white",
+              )}>
+              1
+            </div>
+            <span className="mt-2 text-center text-xs">
+              이메일
+              <br />
+              입력
+            </span>
+          </div>
+
+          {/* Progress Line 1 */}
+          <div className={clsx("mx-2 h-0.5 flex-1", step === "verifyCode" || step === "inputPassword" ? "bg-green-600" : "bg-gray-300")}></div>
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center">
+            <div
+              className={clsx(
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
+                step === "inputEmail" ? "bg-gray-300 text-gray-600" : step === "verifyCode" ? "bg-green-600 text-white" : "bg-green-600 text-white",
+              )}>
+              2
+            </div>
+            <span className="mt-2 text-center text-xs">
+              이메일
+              <br />
+              인증
+            </span>
+          </div>
+
+          {/* Progress Line 2 */}
+          <div className={clsx("mx-2 h-0.5 flex-1", step === "inputPassword" ? "bg-green-600" : "bg-gray-300")}></div>
+
+          {/* Step 3 */}
+          <div className="flex flex-col items-center">
+            <div
+              className={clsx(
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
+                step === "inputPassword" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600",
+              )}>
+              3
+            </div>
+            <span className="mt-2 text-center text-xs">
+              비밀번호
+              <br />
+              설정
+            </span>
+          </div>
+        </div>
+      </div>
 
       {step === "inputEmail" ? (
         <>
